@@ -18,7 +18,13 @@ const App = () => {
     timeVariance: 3
   });
 
-  // Editable funding distribution
+  // Editable grants pipeline
+  const [pipelineData, setPipelineData] = useState([
+    { stage: 'Announcement Planning', value: 100, description: 'Grant opportunities in planning phase' },
+    { stage: 'Announcement Development', value: 85, description: 'Announcements being drafted and reviewed' },
+    { stage: 'Submissions', value: 312, description: 'Applications received this cycle' },
+    { stage: 'Selections', value: 89, description: 'Applications approved for funding' }
+  ]);
   const [fundingData, setFundingData] = useState([
     { category: 'NOFO', amount: 3200000, applications: 178, color: '#3B82F6' },
     { category: 'NOTA Lab Call', amount: 1850000, applications: 94, color: '#10B981' },
@@ -161,13 +167,11 @@ const App = () => {
       { month: 'May', submitted: 267, approved: 78, rejected: 142, pending: 47 },
       { month: 'Jun', submitted: dashboardMetrics.applicationsThisMonth, approved: 89, rejected: 165, pending: 58 }
     ],
-    application_funnel: [
-      { stage: 'Started', value: 1000 },
-      { stage: 'Basic Info', value: 850 },
-      { stage: 'Project Details', value: 680 },
-      { stage: 'Budget', value: 520 },
-      { stage: 'Documents', value: 420 },
-      { stage: 'Submitted', value: 380 }
+    grants_pipeline: [
+      { stage: 'Announcement Planning', value: 100 },
+      { stage: 'Announcement Development', value: 85 },
+      { stage: 'Submissions', value: 312 },
+      { stage: 'Selections', value: 89 }
     ],
     reviewer_workload: [
       { reviewer: 'Dr. Smith', assigned: 45, completed: 42, avg_time: 3.2 },
@@ -297,9 +301,16 @@ const App = () => {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow border">
-          <h3 className="text-lg font-semibold mb-4">Application Completion Funnel</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Grants Program Pipeline</h3>
+            {isEditing && (
+              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                Click values to edit
+              </span>
+            )}
+          </div>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={sampleData.application_funnel} layout="horizontal">
+            <BarChart data={pipelineData} layout="horizontal">
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" />
               <YAxis type="category" dataKey="stage" />
@@ -307,6 +318,22 @@ const App = () => {
               <Bar dataKey="value" fill="#8B5CF6" />
             </BarChart>
           </ResponsiveContainer>
+          {isEditing && (
+            <div className="mt-4 space-y-2">
+              <h4 className="font-medium text-sm">Edit Pipeline Data:</h4>
+              {pipelineData.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm font-medium">{item.stage}:</span>
+                  <input
+                    type="number"
+                    value={item.value}
+                    onChange={(e) => handlePipelineUpdate(index, e.target.value)}
+                    className="border rounded px-2 py-1 w-20 text-sm"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow border">
