@@ -25,6 +25,8 @@ const App = () => {
     { stage: 'Submissions', value: 312, description: 'Applications received this cycle' },
     { stage: 'Selections', value: 89, description: 'Applications approved for funding' }
   ]);
+
+  // Editable funding distribution
   const [fundingData, setFundingData] = useState([
     { category: 'NOFO', amount: 3200000, applications: 178, color: '#3B82F6' },
     { category: 'NOTA Lab Call', amount: 1850000, applications: 94, color: '#10B981' },
@@ -38,6 +40,12 @@ const App = () => {
       ...prev,
       [metric]: parseFloat(value) || 0
     }));
+  };
+
+  const handlePipelineUpdate = (index, value) => {
+    setPipelineData(prev => prev.map((item, i) => 
+      i === index ? { ...item, value: parseInt(value) || 0 } : item
+    ));
   };
 
   const handleFundingUpdate = (index, field, value) => {
@@ -166,12 +174,6 @@ const App = () => {
       { month: 'Apr', submitted: 198, approved: 59, rejected: 115, pending: 24 },
       { month: 'May', submitted: 267, approved: 78, rejected: 142, pending: 47 },
       { month: 'Jun', submitted: dashboardMetrics.applicationsThisMonth, approved: 89, rejected: 165, pending: 58 }
-    ],
-    grants_pipeline: [
-      { stage: 'Announcement Planning', value: 100 },
-      { stage: 'Announcement Development', value: 85 },
-      { stage: 'Submissions', value: 312 },
-      { stage: 'Selections', value: 89 }
     ],
     reviewer_workload: [
       { reviewer: 'Dr. Smith', assigned: 45, completed: 42, avg_time: 3.2 },
