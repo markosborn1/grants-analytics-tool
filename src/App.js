@@ -196,32 +196,293 @@ const App = () => {
     </div>
   );
 
-  const Metrics = () => (
-    <div className="bg-white p-6 rounded-lg shadow border">
-      <h2 className="text-2xl font-bold mb-4">Grant Metrics</h2>
-      <div className="space-y-4">
-        <p>Configure which metrics to track for your grants program:</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border rounded p-4">
-            <h4 className="font-semibold">Application Volume</h4>
-            <p className="text-sm text-gray-600">Track submission trends and patterns</p>
+  const Metrics = () => {
+    // Simulate current metrics data
+    const currentMetrics = {
+      applicationVolume: 312,
+      approvalRate: 28.5,
+      avgProcessingTime: 18,
+      completionRate: 38,
+      reviewerEfficiency: 3.2,
+      applicantSatisfaction: 4.3,
+      fundUtilization: 94,
+      resubmissionRate: 12
+    };
+
+    // Benchmark data (industry standards)
+    const benchmarks = {
+      applicationVolume: { target: 250, industry: 280 },
+      approvalRate: { target: 30, industry: 25 },
+      avgProcessingTime: { target: 15, industry: 20 },
+      completionRate: { target: 45, industry: 35 },
+      reviewerEfficiency: { target: 2.5, industry: 4.0 },
+      applicantSatisfaction: { target: 4.0, industry: 3.8 },
+      fundUtilization: { target: 90, industry: 85 },
+      resubmissionRate: { target: 8, industry: 15 }
+    };
+
+    // Generate insights based on data
+    const generateInsights = () => {
+      const insights = [];
+
+      // Application Volume Analysis
+      if (currentMetrics.applicationVolume > benchmarks.applicationVolume.target) {
+        insights.push({
+          type: 'success',
+          category: 'Application Volume',
+          title: 'High Application Volume Detected',
+          finding: `Receiving ${currentMetrics.applicationVolume} applications (${Math.round(((currentMetrics.applicationVolume - benchmarks.applicationVolume.target) / benchmarks.applicationVolume.target) * 100)}% above target)`,
+          action: 'Consider increasing review team capacity or implementing pre-screening to maintain quality',
+          priority: 'medium',
+          impact: 'Resource allocation may need adjustment to handle increased volume'
+        });
+      }
+
+      // Approval Rate Analysis
+      if (currentMetrics.approvalRate < benchmarks.approvalRate.target) {
+        insights.push({
+          type: 'warning',
+          category: 'Success Metrics',
+          title: 'Below Target Approval Rate',
+          finding: `Current approval rate of ${currentMetrics.approvalRate}% is below target of ${benchmarks.approvalRate.target}%`,
+          action: 'Review selection criteria and provide additional guidance to applicants',
+          priority: 'high',
+          impact: 'May indicate criteria are too strict or applicants need better support'
+        });
+      }
+
+      // Processing Time Analysis
+      if (currentMetrics.avgProcessingTime > benchmarks.avgProcessingTime.target) {
+        insights.push({
+          type: 'critical',
+          category: 'Process Efficiency',
+          title: 'Processing Time Exceeds Target',
+          finding: `Average processing time of ${currentMetrics.avgProcessingTime} days exceeds target of ${benchmarks.avgProcessingTime.target} days`,
+          action: 'Streamline review process and consider adding more reviewers',
+          priority: 'high',
+          impact: 'Delays may frustrate applicants and reduce program effectiveness'
+        });
+      }
+
+      // Completion Rate Analysis
+      if (currentMetrics.completionRate < benchmarks.completionRate.target) {
+        insights.push({
+          type: 'warning',
+          category: 'User Experience',
+          title: 'Low Application Completion Rate',
+          finding: `Only ${currentMetrics.completionRate}% of started applications are completed`,
+          action: 'Analyze application form for user experience issues and add progress indicators',
+          priority: 'medium',
+          impact: 'Losing potential quality applicants due to form complexity'
+        });
+      }
+
+      // Positive Performance
+      if (currentMetrics.applicantSatisfaction > benchmarks.applicantSatisfaction.target) {
+        insights.push({
+          type: 'success',
+          category: 'User Experience',
+          title: 'Excellent Applicant Satisfaction',
+          finding: `Satisfaction score of ${currentMetrics.applicantSatisfaction}/5 exceeds target and industry average`,
+          action: 'Document successful practices and share with similar programs',
+          priority: 'low',
+          impact: 'Strong satisfaction likely to increase word-of-mouth applications'
+        });
+      }
+
+      return insights;
+    };
+
+    const insights = generateInsights();
+
+    const getStatusColor = (current, target, isReverse = false) => {
+      const ratio = current / target;
+      if (isReverse) {
+        if (ratio <= 0.9) return 'text-green-600';
+        if (ratio <= 1.1) return 'text-yellow-600';
+        return 'text-red-600';
+      } else {
+        if (ratio >= 1.1) return 'text-green-600';
+        if (ratio >= 0.9) return 'text-yellow-600';
+        return 'text-red-600';
+      }
+    };
+
+    const getStatusIcon = (current, target, isReverse = false) => {
+      const ratio = current / target;
+      if (isReverse) {
+        if (ratio <= 0.9) return '✅';
+        if (ratio <= 1.1) return '⚠️';
+        return '🚨';
+      } else {
+        if (ratio >= 1.1) return '✅';
+        if (ratio >= 0.9) return '⚠️';
+        return '🚨';
+      }
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Grant Metrics Intelligence</h2>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+            Generate Full Report
+          </button>
+        </div>
+
+        {/* Key Insights Dashboard */}
+        <div className="bg-white p-6 rounded-lg shadow border">
+          <h3 className="text-lg font-semibold mb-4">🎯 Key Insights & Recommended Actions</h3>
+          <div className="space-y-4">
+            {insights.map((insight, index) => (
+              <div key={index} className={`border-l-4 p-4 rounded ${
+                insight.type === 'critical' ? 'border-red-500 bg-red-50' :
+                insight.type === 'warning' ? 'border-yellow-500 bg-yellow-50' :
+                'border-green-500 bg-green-50'
+              }`}>
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-semibold text-gray-900">{insight.title}</h4>
+                  <span className={`px-2 py-1 text-xs rounded ${
+                    insight.priority === 'high' ? 'bg-red-100 text-red-800' :
+                    insight.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    {insight.priority.toUpperCase()} PRIORITY
+                  </span>
+                </div>
+                <p className="text-sm text-gray-700 mb-2"><strong>Finding:</strong> {insight.finding}</p>
+                <p className="text-sm text-gray-700 mb-2"><strong>Recommended Action:</strong> {insight.action}</p>
+                <p className="text-sm text-gray-600"><strong>Impact:</strong> {insight.impact}</p>
+              </div>
+            ))}
           </div>
-          <div className="border rounded p-4">
-            <h4 className="font-semibold">Success Metrics</h4>
-            <p className="text-sm text-gray-600">Monitor approval rates and outcomes</p>
+        </div>
+
+        {/* Performance Scorecard */}
+        <div className="bg-white p-6 rounded-lg shadow border">
+          <h3 className="text-lg font-semibold mb-4">📊 Performance Scorecard</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Application Volume</span>
+                <span className="text-lg">{getStatusIcon(currentMetrics.applicationVolume, benchmarks.applicationVolume.target)}</span>
+              </div>
+              <div className="text-2xl font-bold">{currentMetrics.applicationVolume}</div>
+              <div className={`text-sm ${getStatusColor(currentMetrics.applicationVolume, benchmarks.applicationVolume.target)}`}>
+                Target: {benchmarks.applicationVolume.target} | Industry: {benchmarks.applicationVolume.industry}
+              </div>
+            </div>
+
+            <div className="border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Approval Rate</span>
+                <span className="text-lg">{getStatusIcon(currentMetrics.approvalRate, benchmarks.approvalRate.target)}</span>
+              </div>
+              <div className="text-2xl font-bold">{currentMetrics.approvalRate}%</div>
+              <div className={`text-sm ${getStatusColor(currentMetrics.approvalRate, benchmarks.approvalRate.target)}`}>
+                Target: {benchmarks.approvalRate.target}% | Industry: {benchmarks.approvalRate.industry}%
+              </div>
+            </div>
+
+            <div className="border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Processing Time</span>
+                <span className="text-lg">{getStatusIcon(currentMetrics.avgProcessingTime, benchmarks.avgProcessingTime.target, true)}</span>
+              </div>
+              <div className="text-2xl font-bold">{currentMetrics.avgProcessingTime} days</div>
+              <div className={`text-sm ${getStatusColor(currentMetrics.avgProcessingTime, benchmarks.avgProcessingTime.target, true)}`}>
+                Target: {benchmarks.avgProcessingTime.target} days | Industry: {benchmarks.avgProcessingTime.industry} days
+              </div>
+            </div>
+
+            <div className="border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Completion Rate</span>
+                <span className="text-lg">{getStatusIcon(currentMetrics.completionRate, benchmarks.completionRate.target)}</span>
+              </div>
+              <div className="text-2xl font-bold">{currentMetrics.completionRate}%</div>
+              <div className={`text-sm ${getStatusColor(currentMetrics.completionRate, benchmarks.completionRate.target)}`}>
+                Target: {benchmarks.completionRate.target}% | Industry: {benchmarks.completionRate.industry}%
+              </div>
+            </div>
+
+            <div className="border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Applicant Satisfaction</span>
+                <span className="text-lg">{getStatusIcon(currentMetrics.applicantSatisfaction, benchmarks.applicantSatisfaction.target)}</span>
+              </div>
+              <div className="text-2xl font-bold">{currentMetrics.applicantSatisfaction}/5</div>
+              <div className={`text-sm ${getStatusColor(currentMetrics.applicantSatisfaction, benchmarks.applicantSatisfaction.target)}`}>
+                Target: {benchmarks.applicantSatisfaction.target}/5 | Industry: {benchmarks.applicantSatisfaction.industry}/5
+              </div>
+            </div>
+
+            <div className="border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Fund Utilization</span>
+                <span className="text-lg">{getStatusIcon(currentMetrics.fundUtilization, benchmarks.fundUtilization.target)}</span>
+              </div>
+              <div className="text-2xl font-bold">{currentMetrics.fundUtilization}%</div>
+              <div className={`text-sm ${getStatusColor(currentMetrics.fundUtilization, benchmarks.fundUtilization.target)}`}>
+                Target: {benchmarks.fundUtilization.target}% | Industry: {benchmarks.fundUtilization.industry}%
+              </div>
+            </div>
           </div>
-          <div className="border rounded p-4">
-            <h4 className="font-semibold">Process Efficiency</h4>
-            <p className="text-sm text-gray-600">Review times and workflow optimization</p>
+        </div>
+
+        {/* Deep Dive Recommendations */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow border">
+            <h3 className="text-lg font-semibold mb-4">🔍 Recommended Deep Dives</h3>
+            <div className="space-y-3">
+              <div className="border rounded p-3">
+                <h4 className="font-medium">Application Drop-off Analysis</h4>
+                <p className="text-sm text-gray-600 mb-2">62% of users don't complete applications</p>
+                <button className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm">
+                  Analyze Funnel →
+                </button>
+              </div>
+              <div className="border rounded p-3">
+                <h4 className="font-medium">Reviewer Performance Review</h4>
+                <p className="text-sm text-gray-600 mb-2">Processing times vary significantly by reviewer</p>
+                <button className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm">
+                  View Details →
+                </button>
+              </div>
+              <div className="border rounded p-3">
+                <h4 className="font-medium">Category Performance Comparison</h4>
+                <p className="text-sm text-gray-600 mb-2">NOFO vs TPL approval rate analysis</p>
+                <button className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm">
+                  Compare →
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="border rounded p-4">
-            <h4 className="font-semibold">Funding Distribution</h4>
-            <p className="text-sm text-gray-600">Allocation across categories and types</p>
+
+          <div className="bg-white p-6 rounded-lg shadow border">
+            <h3 className="text-lg font-semibold mb-4">⚡ Quick Wins</h3>
+            <div className="space-y-3">
+              <div className="border rounded p-3 border-green-200 bg-green-50">
+                <h4 className="font-medium text-green-800">Add Progress Indicators</h4>
+                <p className="text-sm text-green-700 mb-2">Could improve completion rate by 15-20%</p>
+                <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">EASY IMPLEMENTATION</span>
+              </div>
+              <div className="border rounded p-3 border-yellow-200 bg-yellow-50">
+                <h4 className="font-medium text-yellow-800">Standardize Review Templates</h4>
+                <p className="text-sm text-yellow-700 mb-2">Reduce processing time variation</p>
+                <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded">MODERATE EFFORT</span>
+              </div>
+              <div className="border rounded p-3 border-blue-200 bg-blue-50">
+                <h4 className="font-medium text-blue-800">Launch Applicant Help Center</h4>
+                <p className="text-sm text-blue-700 mb-2">Address common questions proactively</p>
+                <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">HIGH IMPACT</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const Review = () => (
     <div className="space-y-6">
