@@ -20,6 +20,7 @@ const App = () => {
     { stage: 'Selections', value: 89 }
   ]);
 
+  // Update functions
   const updateMetric = (key, value) => {
     setMetrics(prev => ({ ...prev, [key]: parseFloat(value) || 0 }));
   };
@@ -115,7 +116,7 @@ const App = () => {
         </div>
       </div>
 
-      {/* Pipeline Chart */}
+      {/* Pipeline Section */}
       <div className="bg-white p-6 rounded-lg shadow border">
         <h3 className="text-lg font-semibold mb-4">Grants Program Pipeline</h3>
         <div className="space-y-4">
@@ -145,12 +146,19 @@ const App = () => {
         </div>
       </div>
 
-      {/* Simple Charts */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow border">
           <h3 className="text-lg font-semibold mb-4">Monthly Applications</h3>
           <div className="space-y-2">
-            {['Jan: 156', 'Feb: 189', 'Mar: 234', 'Apr: 198', 'May: 267', `Jun: ${metrics.applications}`].map((item, index) => (
+            {[
+              'Jan: 156',
+              'Feb: 189', 
+              'Mar: 234',
+              'Apr: 198',
+              'May: 267',
+              `Jun: ${metrics.applications}`
+            ].map((item, index) => (
               <div key={index} className="flex justify-between">
                 <span>{item.split(':')[0]}</span>
                 <span className="font-bold">{item.split(':')[1]}</span>
@@ -191,14 +199,75 @@ const App = () => {
   const Metrics = () => (
     <div className="bg-white p-6 rounded-lg shadow border">
       <h2 className="text-2xl font-bold mb-4">Grant Metrics</h2>
-      <p>Metrics configuration coming soon...</p>
+      <div className="space-y-4">
+        <p>Configure which metrics to track for your grants program:</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border rounded p-4">
+            <h4 className="font-semibold">Application Volume</h4>
+            <p className="text-sm text-gray-600">Track submission trends and patterns</p>
+          </div>
+          <div className="border rounded p-4">
+            <h4 className="font-semibold">Success Metrics</h4>
+            <p className="text-sm text-gray-600">Monitor approval rates and outcomes</p>
+          </div>
+          <div className="border rounded p-4">
+            <h4 className="font-semibold">Process Efficiency</h4>
+            <p className="text-sm text-gray-600">Review times and workflow optimization</p>
+          </div>
+          <div className="border rounded p-4">
+            <h4 className="font-semibold">Funding Distribution</h4>
+            <p className="text-sm text-gray-600">Allocation across categories and types</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   const Review = () => (
-    <div className="bg-white p-6 rounded-lg shadow border">
-      <h2 className="text-2xl font-bold mb-4">Quarterly Review</h2>
-      <p>Quarterly review features coming soon...</p>
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow border">
+        <h2 className="text-2xl font-bold mb-4">Quarterly Review</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Quarter</label>
+            <select className="border rounded px-3 py-2">
+              <option>Q2 2024</option>
+              <option>Q1 2024</option>
+              <option>Q4 2023</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-2">Executive Summary</label>
+            <textarea 
+              className="w-full border rounded px-3 py-2 h-32"
+              placeholder="Enter key highlights and insights from this quarter..."
+            />
+          </div>
+          
+          <button className="bg-blue-600 text-white px-4 py-2 rounded">
+            Generate Report
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow border">
+        <h3 className="text-lg font-semibold mb-4">Key Insights</h3>
+        <div className="space-y-3">
+          <div className="border rounded p-4">
+            <h4 className="font-medium">Application Growth</h4>
+            <p className="text-sm text-gray-600">35% increase in applications this quarter</p>
+          </div>
+          <div className="border rounded p-4">
+            <h4 className="font-medium">Process Improvement</h4>
+            <p className="text-sm text-gray-600">Reduced decision time from 25 to 18 days</p>
+          </div>
+          <div className="border rounded p-4">
+            <h4 className="font-medium">Fund Utilization</h4>
+            <p className="text-sm text-gray-600">94% of available funds allocated effectively</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
