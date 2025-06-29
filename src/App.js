@@ -4,6 +4,143 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const App = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedMetrics, setSelectedMetrics] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Editable metrics state
+  const [dashboardMetrics, setDashboardMetrics] = useState({
+    applicationsThisMonth: 312,
+    approvalRate: 28.5,
+    avgGrantAmount: 18750,
+    avgProcessingTime: 18,
+    monthlyGrowth: 23.4,
+    approvalGrowth: 2.1,
+    amountGrowth: 5.2,
+    timeVariance: 3
+  });
+
+  // Editable funding distribution
+  const [fundingData, setFundingData] = useState([
+    { category: 'NOFO', amount: 3200000, applications: 178, color: '#3B82F6' },
+    { category: 'NOTA Lab Call', amount: 1850000, applications: 94, color: '#10B981' },
+    { category: 'TPL', amount: 1450000, applications: 126, color: '#F59E0B' },
+    { category: 'PIA', amount: 1100000, applications: 89, color: '#8B5CF6' },
+    { category: 'Prize', amount: 750000, applications: 45, color: '#EF4444' }
+  ]);
+
+  const handleMetricUpdate = (metric, value) => {
+    setDashboardMetrics(prev => ({
+      ...prev,
+      [metric]: parseFloat(value) || 0
+    }));
+  };
+
+  const handleFundingUpdate = (index, field, value) => {
+    setFundingData(prev => prev.map((item, i) => 
+      i === index ? { ...item, [field]: field === 'amount' || field === 'applications' ? parseInt(value) || 0 : value } : item
+    ));
+  };
+
+  const EditableMetricCard = ({ title, value, trend, trendValue, metricKey, isPercentage, isDollar, suffix = "" }) => (
+    <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm text-gray-600">{title}</p>
+        {isEditing && (
+          <button 
+            onClick={() => setIsEditing(false)}
+            className="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200"
+          >
+            Save
+          </button>
+        )}
+      </div>
+      <div className="flex items-center justify-between">
+        <div>
+          {isEditing ? (
+            <input
+              type="number"
+              value={value}
+              onChange={(e) => handleMetricUpdate(metricKey, e.target.value)}
+              className="text-2xl font-bold border rounded px-2 py-1 w-32"
+              step={isPercentage ? "0.1" : isDollar ? "100" : "1"}
+            />
+          ) : (
+            <p className="text-2xl font-bold">
+              {isDollar && "$"}{value.toLocaleString()}{isPercentage && "%"}{suffix}
+            </p>
+          )}
+          <p className={`text-sm ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-blue-600'}`}>
+            {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{Math.abs(trendValue)}{isPercentage && trend !== 'neutral' ? '%' : ''} vs {trend === 'neutral' ? 'target' : 'last month'}
+          </p>
+        </div>
+        <div className="text-2xl">
+          {title.includes('Applications') && '📊'}
+          {title.includes('Approval') && '🏆'}
+          {title.includes('Grant Amount') && '💰'}
+          {title.includes('Processing') && '⏱️'}
+        </div>
+      </div>
+    </div>
+  );
+
+  const EditableFundingTable = () => (
+    <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Funding Distribution Editor</h3>
+        <button
+          onClick={() => setIsEditing(!isEditing)}
+          className={`px-3 py-1 rounded text-sm ${
+            isEditing ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'
+          }`}
+        >
+          {isEditing ? 'Save Changes' : 'Edit Data'}
+        </button>
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left py-2">Category</th>
+              <th className="text-left py-2">Amount</th>
+              <th className="text-left py-2">Applications</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fundingData.map((item, index) => (
+              <tr key={index} className="border-b">
+                <td className="py-2 font-medium">{item.category}</td>
+                <td className="py-2">
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      value={item.amount}
+                      onChange={(e) => handleFundingUpdate(index, 'amount', e.target.value)}
+                      className="border rounded px-2 py-1 w-32"
+                      step="10000"
+                    />
+                  ) : (
+                    `$${item.amount.toLocaleString()}`
+                  )}
+                </td>
+                <td className="py-2">
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      value={item.applications}
+                      onChange={(e) => handleFundingUpdate(index, 'applications', e.target.value)}
+                      className="border rounded px-2 py-1 w-20"
+                    />
+                  ) : (
+                    item.applications
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
   // Grant-specific metrics library
   const metricsLibrary = [
@@ -22,7 +159,7 @@ const App = () => {
       { month: 'Mar', submitted: 234, approved: 68, rejected: 128, pending: 38 },
       { month: 'Apr', submitted: 198, approved: 59, rejected: 115, pending: 24 },
       { month: 'May', submitted: 267, approved: 78, rejected: 142, pending: 47 },
-      { month: 'Jun', submitted: 312, approved: 89, rejected: 165, pending: 58 }
+      { month: 'Jun', submitted: dashboardMetrics.applicationsThisMonth, approved: 89, rejected: 165, pending: 58 }
     ],
     application_funnel: [
       { stage: 'Started', value: 1000 },
@@ -31,13 +168,6 @@ const App = () => {
       { stage: 'Budget', value: 520 },
       { stage: 'Documents', value: 420 },
       { stage: 'Submitted', value: 380 }
-    ],
-    funding_distribution: [
-      { category: 'NOFO', amount: 3200000, applications: 178, color: '#3B82F6' },
-      { category: 'NOTA Lab Call', amount: 1850000, applications: 94, color: '#10B981' },
-      { category: 'TPL', amount: 1450000, applications: 126, color: '#F59E0B' },
-      { category: 'PIA', amount: 1100000, applications: 89, color: '#8B5CF6' },
-      { category: 'Prize', amount: 750000, applications: 45, color: '#EF4444' }
     ],
     reviewer_workload: [
       { reviewer: 'Dr. Smith', assigned: 45, completed: 42, avg_time: 3.2 },
@@ -93,55 +223,61 @@ const App = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Grants Application Analytics Dashboard</h2>
         <div className="flex gap-2">
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className={`px-4 py-2 rounded-lg ${
+              isEditing ? 'bg-green-600 text-white' : 'bg-orange-600 text-white'
+            }`}
+          >
+            {isEditing ? '✓ Save All Changes' : '✏️ Edit Mode'}
+          </button>
           <button className="bg-green-600 text-white px-4 py-2 rounded-lg">Export Report</button>
           <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">Configure</button>
         </div>
       </div>
 
+      {isEditing && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h4 className="font-medium text-yellow-800 mb-2">🔧 Edit Mode Active</h4>
+          <p className="text-sm text-yellow-700">Click on metric values to edit them directly. Changes are saved in your browser session.</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Applications This Month</p>
-              <p className="text-2xl font-bold">312</p>
-              <p className="text-sm text-green-600">+23.4% vs last month</p>
-            </div>
-            <div className="text-blue-600 text-2xl">📊</div>
-          </div>
-        </div>
+        <EditableMetricCard
+          title="Applications This Month"
+          value={dashboardMetrics.applicationsThisMonth}
+          trend="up"
+          trendValue={dashboardMetrics.monthlyGrowth}
+          metricKey="applicationsThisMonth"
+        />
         
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Approval Rate</p>
-              <p className="text-2xl font-bold">28.5%</p>
-              <p className="text-sm text-green-600">+2.1% vs last month</p>
-            </div>
-            <div className="text-green-600 text-2xl">🏆</div>
-          </div>
-        </div>
+        <EditableMetricCard
+          title="Approval Rate"
+          value={dashboardMetrics.approvalRate}
+          trend="up"
+          trendValue={dashboardMetrics.approvalGrowth}
+          metricKey="approvalRate"
+          isPercentage={true}
+        />
         
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Avg. Grant Amount</p>
-              <p className="text-2xl font-bold">$18,750</p>
-              <p className="text-sm text-blue-600">+5.2% vs last month</p>
-            </div>
-            <div className="text-purple-600 text-2xl">💰</div>
-          </div>
-        </div>
+        <EditableMetricCard
+          title="Avg. Grant Amount"
+          value={dashboardMetrics.avgGrantAmount}
+          trend="up"
+          trendValue={dashboardMetrics.amountGrowth}
+          metricKey="avgGrantAmount"
+          isDollar={true}
+        />
         
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Avg. Processing Time</p>
-              <p className="text-2xl font-bold">18 days</p>
-              <p className="text-sm text-red-600">+3 days vs target</p>
-            </div>
-            <div className="text-yellow-600 text-2xl">⏱️</div>
-          </div>
-        </div>
+        <EditableMetricCard
+          title="Avg. Processing Time"
+          value={dashboardMetrics.avgProcessingTime}
+          trend="neutral"
+          trendValue={dashboardMetrics.timeVariance}
+          metricKey="avgProcessingTime"
+          suffix=" days"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -178,7 +314,7 @@ const App = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={sampleData.funding_distribution}
+                data={fundingData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -187,7 +323,7 @@ const App = () => {
                 fill="#8884d8"
                 dataKey="amount"
               >
-                {sampleData.funding_distribution.map((entry, index) => (
+                {fundingData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -214,6 +350,8 @@ const App = () => {
           </div>
         </div>
       </div>
+
+      {isEditing && <EditableFundingTable />}
     </div>
   );
 
